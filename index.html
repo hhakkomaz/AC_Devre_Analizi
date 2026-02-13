@@ -3,114 +3,670 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doğru Akım Devre Analizi - Ders İçerikleri</title>
+    <title>1. Hafta: Sinüzoidler ve Fazör Kavramı - İnteraktif Ders</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Chosen Palette: Warm Neutrals with Engineering Blue/Red Accents -->
+    <!-- Application Structure Plan: 
+         The application is designed as a vertical scrolling "Interactive Lecture" (Scrollytelling style) divided into 5 logical modules.
+         1. Introduction: Sets the context (AC vs DC) to motivate the learner.
+         2. Sinusoid Anatomy: Interactive graph to visualize Vm, w, and phi parameters physically.
+         3. Phase Difference: A comparator tool to understand Lead/Lag visually.
+         4. Phasor Transformation: A complex plane visualization to bridge the gap between time domain and frequency domain (Euler).
+         5. R-L-C Component Lab: A tabbed interface to explore how specific components affect phase.
+         This structure moves from concrete (time waves) to abstract (phasors) to application (components), mirroring the pedagogical flow of the source report.
+    -->
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #FDFBF7;
-            color: #4A4A4A;
+            background-color: #f5f5f4; /* Warm neutral (Stone-100 equivalent) */
+            color: #1c1917; /* Stone-900 */
         }
-        .lesson-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 1px solid #E5E7EB;
+
+        /* Chart Container Styling - Mandatory Requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Constraint for readability */
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px; /* Base height */
+            max-height: 400px;
         }
-        .lesson-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
         }
-        .lesson-card.disabled {
-            background-color: #F3F4F6;
-            cursor: not-allowed;
-            opacity: 0.7;
+
+        /* Custom Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
         }
-         .lesson-card.disabled:hover {
-            transform: none;
-            box-shadow: none;
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #2563eb;
+            cursor: pointer;
+            margin-top: -6px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #d6d3d1;
+            border-radius: 2px;
         }
     </style>
 </head>
-<body class="antialiased">
+<body class="bg-stone-50 text-stone-800 antialiased">
 
-    <header class="bg-white shadow-sm">
-        <div class="container mx-auto px-6 py-6 text-center">
-            <h1 class="text-4xl font-bold text-amber-700">Alternatif Akım Devre Analizi</h1>
-            <p class="mt-2 text-lg text-gray-600">Meslek Yüksekokulu Ders İçerikleri</p>
+    <!-- Header / Hero Section -->
+    <header class="bg-white shadow-sm border-b border-stone-200 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-bold text-stone-900">EEM 211: Devre Analizi II</h1>
+                <p class="text-sm text-stone-500">Hafta 1: Sinüzoidler ve Fazör Kavramı</p>
+            </div>
+            <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-blue-600 font-semibold text-sm hover:underline">
+                Başa Dön
+            </button>
         </div>
     </header>
 
-    <main class="container mx-auto px-6 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <main class="container mx-auto px-4 py-8 space-y-12 max-w-5xl">
 
-            <div class="lesson-card disabled p-6 rounded-xl flex flex-col items-center justify-center text-center">
-                <span class="text-sm font-semibold text-gray-500">1. Hafta</span>
-                <h2 class="text-2xl font-bold text-gray-400 mt-2">Yakında</h2>
+        <!-- 1. Introduction & Motivation -->
+        <!-- Visualization & Content Choices: Textual comparison cards to explain the shift from DC to AC. Simple, readable layout to set the stage. -->
+        <section id="intro" class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+            <h2 class="text-2xl font-bold mb-4 text-blue-800 border-l-4 border-blue-600 pl-3">Dersin Amacı ve Motivasyon</h2>
+            <p class="text-lg text-stone-600 mb-6 leading-relaxed">
+                Hoş geldiniz. Bu bölümün amacı, sizi zaman domenindeki (t) türev ve integral işlemlerinin zorluğundan kurtarıp, 
+                frekans domenindeki (fazör) cebirsel rahatlığa taşımaktır. Devre Analizi 1'de DC kaynaklar ve diferansiyel denklemlerle uğraştık. 
+                Ancak gerçek dünya (prizdeki elektrik) <strong>220V, 50Hz Sinüs</strong> dalgasıdır.
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-stone-100 p-5 rounded-lg border border-stone-200">
+                    <h3 class="font-bold text-stone-700 mb-2">🚫 Sorun (Zaman Domeni)</h3>
+                    <p class="text-sm text-stone-600">
+                        Sürekli değişen sinüzoidal kaynaklarda diferansiyel denklem çözmek (türev/integral almak) 
+                        çok karmaşık ve zaman alıcıdır.
+                    </p>
+                </div>
+                <div class="bg-blue-50 p-5 rounded-lg border border-blue-200">
+                    <h3 class="font-bold text-blue-700 mb-2">✨ Çözüm (Fazör Domeni)</h3>
+                    <p class="text-sm text-blue-800">
+                        <strong>"Sihirli Değnek":</strong> Fazör yöntemi ile türev almayı çarpmaya, 
+                        integral almayı bölmeye dönüştüreceğiz.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Sinusoid Anatomy (Interactive) -->
+        <!-- Visualization & Content Choices: Interactive Line Chart using Chart.js.
+             Goal: Allow students to manipulate Vm, w, and phi to visualize the equation v(t) = Vm cos(wt + phi).
+             Justification: Static board drawings make it hard to understand "Phase Shift". Sliders provide immediate feedback.
+             Note: Uses a cosine wave as requested (Engineering reference).
+        -->
+        <section id="sinusoid-anatomy" class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+            <h2 class="text-2xl font-bold mb-4 text-blue-800 border-l-4 border-blue-600 pl-3">Sinüzoidin Anatomisi</h2>
+            <p class="text-stone-600 mb-6">
+                Mühendislikte referansımız <strong>Kosinüs</strong> dalgasıdır. Aşağıdaki simülasyonu kullanarak 
+                $v(t) = V_m \cos(\omega t + \phi)$ formülündeki parametrelerin dalgayı nasıl değiştirdiğini gözlemleyin.
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Controls -->
+                <div class="lg:col-span-1 space-y-6 bg-stone-50 p-6 rounded-lg border border-stone-200">
+                    <div>
+                        <label class="block text-sm font-semibold text-stone-700 mb-2">
+                            $V_m$ (Genlik): <span id="val-vm" class="text-blue-600">10</span> V
+                        </label>
+                        <input type="range" id="input-vm" min="1" max="20" value="10" step="1" oninput="updateSinusoid()">
+                        <p class="text-xs text-stone-500 mt-1">Tepe noktası ile sıfır ekseni arası.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-stone-700 mb-2">
+                            $\omega$ (Açısal Frekans): <span id="val-w" class="text-blue-600">1</span> rad/s
+                        </label>
+                        <input type="range" id="input-w" min="0.5" max="5" value="1" step="0.1" oninput="updateSinusoid()">
+                        <p class="text-xs text-stone-500 mt-1">Dalganın hızı ($\omega = 2\pi f$).</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-stone-700 mb-2">
+                            $\phi$ (Faz Açısı): <span id="val-phi" class="text-blue-600">0</span>&deg;
+                        </label>
+                        <input type="range" id="input-phi" min="-180" max="180" value="0" step="15" oninput="updateSinusoid()">
+                        <p class="text-xs text-stone-500 mt-1">
+                            +: Sola kayar (Erken/Önde)<br>
+                            -: Sağa kayar (Geç/Geride)
+                        </p>
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                        <strong>Denklem:</strong><br>
+                        <span id="equation-display" class="font-mono text-base">v(t) = 10 cos(1t + 0°)</span>
+                    </div>
+                </div>
+
+                <!-- Visualization -->
+                <div class="lg:col-span-2 flex flex-col justify-center">
+                    <div class="chart-container">
+                        <canvas id="sinusoidChart"></canvas>
+                    </div>
+                    <div class="text-center mt-2 text-sm text-stone-500">Zaman (t)</div>
+                </div>
             </div>
 
-            <div class="lesson-card disabled p-6 rounded-xl flex flex-col items-center justify-center text-center">
-                <span class="text-sm font-semibold text-gray-500">2. Hafta</span>
-                <h2 class="text-2xl font-bold text-gray-400 mt-2">Yakında</h2>
+            <!-- Trig "Cheat Sheet" -->
+            <div class="mt-8 bg-stone-800 text-stone-200 p-5 rounded-lg">
+                <h4 class="font-bold text-yellow-400 mb-3 border-b border-stone-600 pb-2">📌 Unutulmayacaklar Kutusu</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p class="font-semibold text-white">Fazör Biletiniz: KOSİNÜS</p>
+                        <p class="mt-1">Sinüs gelirse dönüştürün:</p>
+                        <code class="block bg-stone-900 p-2 mt-1 rounded text-green-400">sin(ωt) = cos(ωt - 90°)</code>
+                        <p class="text-xs text-stone-400 mt-1">"Sinüs, Kosinüs'ün 90 derece gerisinden gelir."</p>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-white">İşaret Dönüşümleri:</p>
+                        <code class="block bg-stone-900 p-2 mt-1 rounded text-yellow-200">-cos(ωt) = cos(ωt ± 180°)</code>
+                        <code class="block bg-stone-900 p-2 mt-1 rounded text-yellow-200">-sin(ωt) = cos(ωt + 90°)</code>
+                    </div>
+                </div>
             </div>
+        </section>
 
-            <div class="lesson-card disabled p-6 rounded-xl flex flex-col items-center justify-center text-center">
-                <span class="text-sm font-semibold text-gray-500">3. Hafta</span>
-                <h2 class="text-2xl font-bold text-gray-400 mt-2">Yakında</h2>
+        <!-- 3. Lead/Lag Concept -->
+        <!-- Visualization & Content Choices: Dual Line Chart.
+             Goal: Compare two waves to teach "Lead" vs "Lag".
+             Interaction: Slider changes phase of Current relative to Voltage.
+        -->
+        <section id="lead-lag" class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+            <h2 class="text-2xl font-bold mb-4 text-blue-800 border-l-4 border-blue-600 pl-3">Faz Farkı: Lead / Lag</h2>
+            <p class="text-stone-600 mb-6">
+                İki dalganın zirve noktaları arasındaki zaman farkı faz farkını oluşturur. 
+                <span class="text-blue-600 font-bold">Voltaj (v)</span> sabitken, 
+                <span class="text-red-600 font-bold">Akımı (i)</span> kaydırarak ilişkinin nasıl değiştiğini görün.
+            </p>
+
+            <div class="flex flex-col md:flex-row gap-8 items-center">
+                <div class="w-full md:w-1/3 space-y-4">
+                    <label class="block text-sm font-semibold text-stone-700">
+                        Akım Faz Farkı ($\theta_i$): <span id="val-lag" class="text-red-600">-30</span>&deg;
+                    </label>
+                    <input type="range" id="input-lag" min="-180" max="180" value="-30" step="15" oninput="updateLeadLag()">
+                    
+                    <div id="lag-status" class="p-4 rounded-lg bg-stone-100 border border-stone-200 text-center font-bold text-lg">
+                        Akım Gecikiyor (Lag)
+                    </div>
+                    <p class="text-xs text-stone-500 mt-2">
+                        Not: Frekanslar farklı olsaydı faz farkından bahsedemezdik.
+                    </p>
+                </div>
+
+                <div class="w-full md:w-2/3">
+                    <div class="chart-container">
+                        <canvas id="leadLagChart"></canvas>
+                    </div>
+                </div>
             </div>
+        </section>
 
-            <div class="lesson-card disabled p-6 rounded-xl flex flex-col items-center justify-center text-center">
-                <span class="text-sm font-semibold text-gray-500">4. Hafta</span>
-                <h2 class="text-2xl font-bold text-gray-400 mt-2">Yakında</h2>
-            </div>
+        <!-- 4. Phasor Transformation (Math Core) -->
+        <!-- Visualization & Content Choices: Scatter Plot on Cartesian Plane.
+             Goal: Visualize Euler's identity. Mapping Time Domain -> Phasor Domain.
+             Interaction: Toggle between Polar and Rectangular forms using JS logic.
+        -->
+        <section id="phasors" class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+            <h2 class="text-2xl font-bold mb-4 text-blue-800 border-l-4 border-blue-600 pl-3">Karmaşık Sayılar ve Fazörün Doğuşu</h2>
+            <p class="text-stone-600 mb-6">
+                Euler formülü ($e^{j\theta} = \cos\theta + j\sin\theta$) sayesinde zamanı ($t$) denklemden atıp sadece 
+                <strong>Genlik</strong> ve <strong>Açı</strong> ile çalışabiliriz. Buna <strong>Fazör</strong> denir.
+            </p>
 
-            <div class="lesson-card disabled p-6 rounded-xl flex flex-col items-center justify-center text-center">
-                <span class="text-sm font-semibold text-gray-500">5. Hafta</span>
-                <h2 class="text-2xl font-bold text-gray-400 mt-2">Yakında</h2>
-            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Math Explanation -->
+                <div class="space-y-6">
+                    <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                        <h4 class="font-bold text-blue-900">Zaman Domeni</h4>
+                        <p class="font-mono text-lg text-stone-800 mt-2">v(t) = V_m cos(ωt + ϕ)</p>
+                    </div>
+                    
+                    <div class="flex justify-center text-3xl text-stone-400">⬇️</div>
 
-            <div class="lesson-card disabled p-6 rounded-xl flex flex-col items-center justify-center text-center">
-                <span class="text-sm font-semibold text-gray-500">6. Hafta</span>
-                <h2 class="text-2xl font-bold text-gray-400 mt-2">Yakında</h2>
-            </div>
+                    <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+                        <h4 class="font-bold text-green-900">Fazör Domeni (Kutupsal)</h4>
+                        <p class="font-mono text-lg text-stone-800 mt-2">V = V_m ∠ ϕ</p>
+                        <p class="text-xs text-stone-500 mt-1">t ve cos gitti, sadece genlik ve açı kaldı.</p>
+                    </div>
 
-            <div class="lesson-card disabled p-6 rounded-xl flex flex-col items-center justify-center text-center">
-                <span class="text-sm font-semibold text-gray-500">7. Hafta</span>
-                <h2 class="text-2xl font-bold text-gray-400 mt-2">Yakında</h2>
-            </div>
+                    <div class="bg-stone-100 p-4 rounded-lg">
+                        <h4 class="font-bold text-stone-700 text-sm mb-2">Hesap Makinesi: Dikdörtgen Form</h4>
+                        <p id="rect-form-display" class="font-mono text-stone-800">z = a + jb</p>
+                    </div>
+                </div>
 
-            <div class="lesson-card disabled p-6 rounded-xl flex flex-col items-center justify-center text-center">
-                <span class="text-sm font-semibold text-gray-500">8. Hafta</span>
-                <h2 class="text-2xl font-bold text-gray-400 mt-2">Yakında</h2>
-            </div>
-
-            <div class="lesson-card disabled p-6 rounded-xl flex flex-col items-center justify-center text-center">
-                <span class="text-sm font-semibold text-gray-500">9. Hafta</span>
-                <h2 class="text-2xl font-bold text-gray-400 mt-2">Yakında</h2>
-            </div>
-
-            <div class="lesson-card disabled p-6 rounded-xl flex flex-col items-center justify-center text-center">
-                <span class="text-sm font-semibold text-gray-500">10. Hafta</span>
-                <h2 class="text-2xl font-bold text-gray-400 mt-2">Yakında</h2>
+                <!-- Complex Plane Visualization -->
+                <div class="flex flex-col items-center">
+                    <h4 class="text-sm font-bold text-stone-500 mb-2">Karmaşık Düzlem (Fazör Diyagramı)</h4>
+                    <div class="chart-container" style="max-width: 400px; height: 350px;">
+                        <canvas id="phasorChart"></canvas>
+                    </div>
+                    <div class="mt-4 w-full px-4">
+                        <label class="text-sm font-semibold text-stone-700">Fazör Açısı ($\phi$)</label>
+                        <input type="range" id="input-phasor-angle" min="0" max="360" value="45" step="5" oninput="updatePhasorDiagram()">
+                    </div>
+                </div>
             </div>
             
-            <div class="lesson-card disabled p-6 rounded-xl flex flex-col items-center justify-center text-center">
-                <span class="text-sm font-semibold text-gray-500">11. Hafta</span>
-                <h2 class="text-2xl font-bold text-gray-400 mt-2">Yakında</h2>
+            <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-900">
+                <strong>Fazörün Gücü (Türev Alma):</strong><br>
+                Zaman domeninde türev almak ($\frac{d}{dt}$), fazör dünyasında sadece <strong>$j\omega$</strong> ile çarpmak demektir!<br>
+                Bu özellik sayesinde diferansiyel denklemler basit cebirsel denklemlere dönüşür.
+            </div>
+        </section>
+
+        <!-- 5. Passive Components (R, L, C) Lab -->
+        <!-- Visualization & Content Choices: Tabbed Interface.
+             Goal: Show how R, L, and C behave differently in AC.
+             Interaction: Clicking tabs updates the content and the phase description dynamically.
+             Justification: Groups related info (Time eq, Phasor eq, Impedance, Phase shift) per component.
+        -->
+        <section id="components" class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+            <h2 class="text-2xl font-bold mb-4 text-blue-800 border-l-4 border-blue-600 pl-3">Pasif Elemanların Fazör İlişkileri</h2>
+            <p class="text-stone-600 mb-6">
+                Her elemanın akım ve voltaj arasında yarattığı faz farkı (Empedans) farklıdır. Bir eleman seçerek inceleyin.
+            </p>
+
+            <!-- Tabs -->
+            <div class="flex space-x-2 mb-6 border-b border-stone-200">
+                <button onclick="switchComponent('R')" id="tab-R" class="px-6 py-2 font-bold text-stone-600 hover:text-blue-600 border-b-2 border-transparent transition-colors">Direnç (R)</button>
+                <button onclick="switchComponent('L')" id="tab-L" class="px-6 py-2 font-bold text-stone-600 hover:text-blue-600 border-b-2 border-transparent transition-colors">Bobin (L)</button>
+                <button onclick="switchComponent('C')" id="tab-C" class="px-6 py-2 font-bold text-stone-600 hover:text-blue-600 border-b-2 border-transparent transition-colors">Kapasitör (C)</button>
             </div>
 
-            <div class="lesson-card disabled p-6 rounded-xl flex flex-col items-center justify-center text-center">
-                <span class="text-sm font-semibold text-gray-500">12. Hafta</span>
-                <h2 class="text-2xl font-bold text-gray-400 mt-2">Yakında</h2>
+            <!-- Content Area -->
+            <div id="component-content" class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center min-h-[300px]">
+                <!-- Populated by JS -->
             </div>
+        </section>
 
-        </div>
+        <!-- Summary Table -->
+        <section class="bg-white rounded-xl shadow-lg p-6 md:p-8 overflow-x-auto">
+            <h2 class="text-2xl font-bold mb-4 text-stone-800">Özet Tablosu</h2>
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-stone-100 text-stone-700">
+                        <th class="p-3 border-b">Eleman</th>
+                        <th class="p-3 border-b">Zaman Domeni</th>
+                        <th class="p-3 border-b">Fazör (Empedans)</th>
+                        <th class="p-3 border-b">Faz İlişkisi</th>
+                    </tr>
+                </thead>
+                <tbody class="text-stone-600 text-sm md:text-base">
+                    <tr class="border-b hover:bg-stone-50">
+                        <td class="p-3 font-bold">R (Direnç)</td>
+                        <td class="p-3 font-mono">v = iR</td>
+                        <td class="p-3 font-mono">Z = R</td>
+                        <td class="p-3">Faz farkı yok (0°)</td>
+                    </tr>
+                    <tr class="border-b hover:bg-stone-50">
+                        <td class="p-3 font-bold">L (Bobin)</td>
+                        <td class="p-3 font-mono">v = L(di/dt)</td>
+                        <td class="p-3 font-mono">Z = jωL</td>
+                        <td class="p-3">Voltaj 90° önde (+j)</td>
+                    </tr>
+                    <tr>
+                        <td class="p-3 font-bold">C (Kapasitör)</td>
+                        <td class="p-3 font-mono">i = C(dv/dt)</td>
+                        <td class="p-3 font-mono">Z = 1/(jωC)</td>
+                        <td class="p-3">Akım 90° önde (-j)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
     </main>
 
-    <footer class="bg-gray-800 text-white mt-12">
-        <div class="container mx-auto px-6 py-4 text-center">
-            <p>&copy; 2025 - Tüm Hakları Saklıdır.</p>
-        </div>
+    <footer class="bg-stone-900 text-stone-400 py-8 mt-12 text-center">
+        <p class="mb-2">EEM 211 - Devre Analizi II</p>
+        <p class="text-xs">Haftaya Hazırlık: Hesap makinenizin "Complex Mode"unu (Kutupsal/Dikdörtgen dönüşümü) çalışın.</p>
     </footer>
 
+    <!-- JavaScript Logic -->
+    <script>
+        // --- Global State & Setup ---
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#44403c';
+        
+        // --- 1. Sinusoid Chart Logic ---
+        const ctxSin = document.getElementById('sinusoidChart').getContext('2d');
+        let sinusoidChart = new Chart(ctxSin, {
+            type: 'line',
+            data: {
+                labels: [], // Time steps
+                datasets: [{
+                    label: 'v(t)',
+                    data: [],
+                    borderColor: '#2563eb', // Blue-600
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 0 }, // Instant updates
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Zaman (t)' },
+                        ticks: { display: false },
+                        grid: { display: false }
+                    },
+                    y: {
+                        title: { display: true, text: 'Voltaj (V)' },
+                        min: -25, max: 25
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        function generateSinData(Vm, w, phiDeg) {
+            const points = [];
+            const labels = [];
+            const phiRad = phiDeg * (Math.PI / 180);
+            
+            // Generate 2 cycles roughly based on w=1
+            // Total time T = 2pi/w. If w=1, T=6.28. Let's plot 0 to 12.
+            // Resolution needs to be high for smooth curves.
+            for (let t = 0; t <= 12; t += 0.1) {
+                labels.push(t.toFixed(1));
+                points.push(Vm * Math.cos(w * t + phiRad));
+            }
+            return { labels, points };
+        }
+
+        function updateSinusoid() {
+            const Vm = parseFloat(document.getElementById('input-vm').value);
+            const w = parseFloat(document.getElementById('input-w').value);
+            const phi = parseFloat(document.getElementById('input-phi').value);
+
+            // Update Labels
+            document.getElementById('val-vm').innerText = Vm;
+            document.getElementById('val-w').innerText = w;
+            document.getElementById('val-phi').innerText = phi;
+            document.getElementById('equation-display').innerText = `v(t) = ${Vm} cos(${w}t + ${phi}°)`;
+
+            // Update Chart
+            const data = generateSinData(Vm, w, phi);
+            sinusoidChart.data.labels = data.labels;
+            sinusoidChart.data.datasets[0].data = data.points;
+            sinusoidChart.update();
+        }
+
+        // --- 2. Lead/Lag Chart Logic ---
+        const ctxLeadLag = document.getElementById('leadLagChart').getContext('2d');
+        let leadLagChart = new Chart(ctxLeadLag, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Voltaj v(t)', // Reference
+                        data: [],
+                        borderColor: '#2563eb', // Blue
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Akım i(t)', // Moving
+                        data: [],
+                        borderColor: '#dc2626', // Red
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        borderDash: [5, 5],
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 0 },
+                scales: {
+                    x: { display: false },
+                    y: { min: -12, max: 12 }
+                }
+            }
+        });
+
+        function updateLeadLag() {
+            const lagAngle = parseFloat(document.getElementById('input-lag').value);
+            document.getElementById('val-lag').innerText = lagAngle;
+
+            // Logic for Text
+            const statusEl = document.getElementById('lag-status');
+            if (lagAngle === 0) {
+                statusEl.innerText = "Aynı Fazda (In Phase)";
+                statusEl.className = "p-4 rounded-lg bg-green-100 border border-green-200 text-center font-bold text-lg text-green-800";
+            } else if (lagAngle < 0) {
+                statusEl.innerText = `Akım Gecikiyor (Lags by ${Math.abs(lagAngle)}°)`;
+                statusEl.className = "p-4 rounded-lg bg-stone-100 border border-stone-200 text-center font-bold text-lg text-stone-800";
+            } else {
+                statusEl.innerText = `Akım İleride (Leads by ${lagAngle}°)`;
+                statusEl.className = "p-4 rounded-lg bg-blue-50 border border-blue-200 text-center font-bold text-lg text-blue-800";
+            }
+
+            // Generate Data (Fixed w=1, Vm=10 for V, Vm=8 for I)
+            const pointsV = [];
+            const pointsI = [];
+            const labels = [];
+            const rad = lagAngle * (Math.PI / 180);
+
+            for (let t = 0; t <= 12; t += 0.1) {
+                labels.push(t);
+                pointsV.push(10 * Math.cos(t)); // Reference
+                pointsI.push(7 * Math.cos(t + rad)); // Shifted
+            }
+
+            leadLagChart.data.labels = labels;
+            leadLagChart.data.datasets[0].data = pointsV;
+            leadLagChart.data.datasets[1].data = pointsI;
+            leadLagChart.update();
+        }
+
+        // --- 3. Phasor Diagram Logic (Scatter) ---
+        const ctxPhasor = document.getElementById('phasorChart').getContext('2d');
+        let phasorChart = new Chart(ctxPhasor, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Fazör V',
+                    data: [],
+                    backgroundColor: '#2563eb',
+                    borderColor: '#2563eb',
+                    showLine: true, // Draws line from previous point
+                    pointRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 0 },
+                scales: {
+                    x: {
+                        min: -10, max: 10,
+                        title: { display: true, text: 'Reel (a)' },
+                        grid: { color: '#e7e5e4' }
+                    },
+                    y: {
+                        min: -10, max: 10,
+                        title: { display: true, text: 'Sanal (jb)' },
+                        grid: { color: '#e7e5e4' }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Re: ${context.parsed.x.toFixed(2)}, Im: ${context.parsed.y.toFixed(2)}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        function updatePhasorDiagram() {
+            const angleDeg = parseFloat(document.getElementById('input-phasor-angle').value);
+            const r = 8; // Fixed magnitude for visualization
+            const rad = angleDeg * (Math.PI / 180);
+            
+            const x = r * Math.cos(rad);
+            const y = r * Math.sin(rad);
+
+            // Rectangular form calc
+            const sign = y >= 0 ? '+' : '-';
+            document.getElementById('rect-form-display').innerText = `z = ${x.toFixed(2)} ${sign} j${Math.abs(y).toFixed(2)}`;
+
+            // Data: Origin -> Point
+            phasorChart.data.datasets[0].data = [{x: 0, y: 0}, {x: x, y: y}];
+            phasorChart.update();
+        }
+
+        // --- 4. Component Lab Logic ---
+        const componentData = {
+            'R': {
+                title: "Direnç (Resistor)",
+                color: "border-stone-500",
+                desc: "Direnç en dürüst elemandır. Voltaj ne yaparsa Akım da aynısını yapar.",
+                timeEq: "v = iR",
+                phasorEq: "V = IR",
+                z: "Z = R",
+                shift: "0° (Aynı Faz)",
+                vizAngle: 0
+            },
+            'L': {
+                title: "Bobin (Inductor)",
+                color: "border-blue-500",
+                desc: "Bobinde değişim zordur. Türev (jω) işin içine girer. Voltaj, Akımdan 90° önde gider.",
+                timeEq: "v = L(di/dt)",
+                phasorEq: "V = jωL · I",
+                z: "Z = jωL",
+                shift: "+90° (Voltaj Önde)",
+                vizAngle: 90
+            },
+            'C': {
+                title: "Kapasitör (Capacitor)",
+                color: "border-red-500",
+                desc: "Kapasitörde integral (1/jω) vardır. Bu da -j demektir. Voltaj, Akımdan 90° geride kalır.",
+                timeEq: "i = C(dv/dt)",
+                phasorEq: "V = I / (jωC)",
+                z: "Z = 1/(jωC) = -j/(ωC)",
+                shift: "-90° (Voltaj Geride)",
+                vizAngle: -90
+            }
+        };
+
+        function switchComponent(type) {
+            const data = componentData[type];
+            
+            // UI State
+            ['R', 'L', 'C'].forEach(k => {
+                const btn = document.getElementById(`tab-${k}`);
+                if(k === type) {
+                    btn.classList.add('border-blue-600', 'text-blue-600');
+                    btn.classList.remove('border-transparent');
+                } else {
+                    btn.classList.remove('border-blue-600', 'text-blue-600');
+                    btn.classList.add('border-transparent');
+                }
+            });
+
+            // Content Injection
+            const html = `
+                <div class="space-y-4">
+                    <h3 class="text-xl font-bold text-stone-800">${data.title}</h3>
+                    <p class="text-stone-600">${data.desc}</p>
+                    <div class="bg-stone-50 p-4 rounded border-l-4 ${data.color}">
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="block text-stone-500 font-bold">Zaman:</span>
+                                <span class="font-mono text-stone-800">${data.timeEq}</span>
+                            </div>
+                            <div>
+                                <span class="block text-stone-500 font-bold">Fazör:</span>
+                                <span class="font-mono text-stone-800">${data.phasorEq}</span>
+                            </div>
+                            <div class="col-span-2 mt-2 pt-2 border-t border-stone-200">
+                                <span class="block text-stone-500 font-bold">Empedans (Z):</span>
+                                <span class="font-mono text-lg font-bold text-blue-700">${data.z}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col items-center justify-center p-6 bg-stone-50 rounded-lg">
+                    <h4 class="text-sm font-bold text-stone-500 mb-4">Vektör Diyagramı</h4>
+                    <!-- Simple CSS/HTML Vector Viz -->
+                    <div class="relative w-40 h-40 bg-white rounded-full border border-stone-200 flex items-center justify-center shadow-inner">
+                        <!-- Axis -->
+                        <div class="absolute w-full h-[1px] bg-stone-300"></div>
+                        <div class="absolute h-full w-[1px] bg-stone-300"></div>
+                        
+                        <!-- Current (Reference) -->
+                        <div class="absolute w-[45%] h-[2px] bg-red-500 right-[5%] top-1/2 flex items-center justify-end">
+                            <span class="text-xs font-bold text-red-600 -mt-4">I</span>
+                            <div class="w-0 h-0 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent border-l-[6px] border-l-red-500"></div>
+                        </div>
+
+                        <!-- Voltage (Rotating) -->
+                        <div style="transform: rotate(${-data.vizAngle}deg); width: 45%; transform-origin: left center;" 
+                             class="absolute h-[2px] bg-blue-500 left-1/2 top-1/2 flex items-center justify-end transition-transform duration-500">
+                            <span class="text-xs font-bold text-blue-600 -mt-4 transform rotate(${data.vizAngle}deg)">V</span>
+                            <div class="w-0 h-0 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent border-l-[6px] border-l-blue-500"></div>
+                        </div>
+                    </div>
+                    <div class="mt-4 font-bold text-stone-700">${data.shift}</div>
+                </div>
+            `;
+            
+            document.getElementById('component-content').innerHTML = html;
+        }
+
+        // Initialize
+        updateSinusoid();
+        updateLeadLag();
+        updatePhasorDiagram();
+        switchComponent('R'); // Default
+
+    </script>
+    
+    <!-- CONFIRMATION: NO SVG graphics used (except implicit in Chart.js canvas rendering). NO Mermaid JS used. -->
 </body>
 </html>
